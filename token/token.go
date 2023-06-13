@@ -28,6 +28,8 @@ const (
 	NOT_EQ   = "!="
 	GT_EQ    = ">="
 	LT_EQ    = "<="
+	AND      = "&&"
+	OR       = "||"
 
 	// Delimiters
 	COMMA     = ","
