@@ -2,7 +2,7 @@ package vm
 
 import (
 	"fmt"
-	"interpreter/ast"
+	"turbo/ast"
 )
 
 // global constants

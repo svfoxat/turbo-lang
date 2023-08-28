@@ -3,10 +3,10 @@ package repl
 import (
 	"bufio"
 	"fmt"
-	"interpreter/lexer"
-	"interpreter/parser"
-	"interpreter/vm"
 	"io"
+	"turbo/lexer"
+	"turbo/parser"
+	"turbo/vm"
 )
 
 const PROMPT = ">>> "

@@ -6,10 +6,10 @@ package parser
 // https://en.wikipedia.org/wiki/Pratt_parser
 
 import (
-	"interpreter/ast"
-	"interpreter/lexer"
-	"interpreter/token"
 	"strconv"
+	"turbo/ast"
+	"turbo/lexer"
+	"turbo/token"
 
 	"fmt"
 )

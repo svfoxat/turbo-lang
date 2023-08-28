@@ -1,8 +1,8 @@
 package main
 
 import (
-	"interpreter/repl"
 	"os"
+	"turbo/repl"
 )
 
 func main() {

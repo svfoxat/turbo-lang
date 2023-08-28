@@ -2,9 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"interpreter/ast"
-	"interpreter/lexer"
 	"testing"
+	"turbo/ast"
+	"turbo/lexer"
 )
 
 func TestSimpleLetStatements(t *testing.T) {

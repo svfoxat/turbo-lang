@@ -1,10 +1,10 @@
 package vm_test
 
 import (
-	"interpreter/lexer"
-	"interpreter/parser"
-	"interpreter/vm"
 	"testing"
+	"turbo/lexer"
+	"turbo/parser"
+	"turbo/vm"
 )
 
 func TestLetStatement(t *testing.T) {

@@ -2,8 +2,8 @@ package ast
 
 import (
 	"bytes"
-	"interpreter/token"
 	"strings"
+	"turbo/token"
 )
 
 type Node interface {

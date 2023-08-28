@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"interpreter/token"
 	"testing"
+	"turbo/token"
 )
 
 // let x = 5 in AST form
