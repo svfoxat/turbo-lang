@@ -5,12 +5,15 @@ import (
 	"fmt"
 	"interpreter/lexer"
 	"interpreter/parser"
+	"interpreter/vm"
 	"io"
 )
 
-const PROMPT = "<interpreter> "
+const PROMPT = ">>> "
 
 func Start(in io.Reader, out io.Writer) {
+	printBanner()
+
 	scanner := bufio.NewScanner(in)
 
 	for {
@@ -31,8 +34,11 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluated := vm.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
@@ -40,4 +46,8 @@ func printParserErrors(out io.Writer, errors []string) {
 	for _, msg := range errors {
 		io.WriteString(out, "\t"+msg+"\n")
 	}
+}
+
+func printBanner() {
+	fmt.Println("Seas hawara, I bims 1 Interpreter lol")
 }

@@ -101,7 +101,9 @@ func (l *Lexer) NextToken() token.Token {
 	}
 
 	l.readChar()
-	return tok
+
+    // print the chars 
+    return tok
 }
 
 func newToken(tokenType token.TokenType, ch byte) token.Token {
