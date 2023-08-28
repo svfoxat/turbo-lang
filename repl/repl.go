@@ -4,9 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"turbo/interpreter"
 	"turbo/lexer"
 	"turbo/parser"
-	"turbo/vm"
 )
 
 const PROMPT = ">>> "
