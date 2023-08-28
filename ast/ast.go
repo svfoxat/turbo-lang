@@ -269,6 +269,5 @@ func (ce *CallExpression) String() string { // pretty-printing
 	out.WriteString("(")
 	out.WriteString(strings.Join(args, ", "))
 	out.WriteString(")")
-
 	return out.String()
 }
