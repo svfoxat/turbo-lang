@@ -1,14 +1,20 @@
 BINARY_NAME=turbo
+OUTPUT_DIR=bin
 
 build:
-	GOARCH=amd64 GOOS=linux go build -o ${BINARY_NAME} main.go
+	go build -o ${OUTPUT_DIR}/${BINARY_NAME} main.go
+	# GOARCH=amd64 GOOS=windows go build -o ${BINARY_NAME}.exe main.go
+	# GOARCH=amd64 GOOS=darwin go build -o ${BINARY_NAME}.mac main.go
+	# GOARCH=arm64 GOOS=linux go build -o ${BINARY_NAME}.arm main.go
+	# GOARCH=arm64 GOOS=windows go build -o ${BINARY_NAME}.arm.exe main.go
+	# GOARCH=arm64 GOOS=darwin go build -o ${BINARY_NAME}.arm.mac main.go
 
 run: build
-	./${BINARY_NAME}
+	./${OUTPUT_DIR}/${BINARY_NAME}
 
 clean:
 	go clean
-	rm ${BINARY_NAME}
+	rm ${OUTPUT_DIR}/${BINARY_NAME}
 
 test:
 	go test ./...
