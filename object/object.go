@@ -14,6 +14,19 @@ type Object interface {
 	Inspect() string
 }
 
+type BuiltinFunction func(args ...Object) Object
+
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() ObjectType {
+	return FUNCTION_OBJ
+}
+func (b *Builtin) Inspect() string {
+	return "builtin function"
+}
+
 const (
 	INTEGER_OBJ      = "INTEGER"
 	BOOLEAN_OBJ      = "BOOLEAN"
@@ -33,7 +46,7 @@ func (i *Integer) Type() ObjectType {
 	return INTEGER_OBJ
 }
 func (i *Integer) Inspect() string {
-	return fmt.Sprintf("[Integer %d]", i.Value)
+	return fmt.Sprintf("%d", i.Value)
 }
 
 type Boolean struct {
@@ -44,7 +57,7 @@ func (b *Boolean) Type() ObjectType {
 	return BOOLEAN_OBJ
 }
 func (b *Boolean) Inspect() string {
-	return fmt.Sprintf("[Boolean %t]", b.Value)
+	return fmt.Sprintf("%t", b.Value)
 }
 
 type Null struct{}
@@ -53,7 +66,7 @@ func (n *Null) Type() ObjectType {
 	return NULL_OBJ
 }
 func (n *Null) Inspect() string {
-	return "[Null null]"
+	return "null"
 }
 
 type ReturnValue struct {
@@ -64,7 +77,7 @@ func (rv *ReturnValue) Type() ObjectType {
 	return RETURN_VALUE_OBJ
 }
 func (rv *ReturnValue) Inspect() string {
-	return fmt.Sprintf("[ReturnValue %s]", rv.Value.Inspect())
+	return fmt.Sprintf("%s", rv.Value.Inspect())
 }
 
 type Error struct {
