@@ -21,6 +21,8 @@ const (
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	ERROR_OBJ        = "ERROR"
 	FUNCTION_OBJ     = "FUNCTION"
+	STRING_OBJ       = "STRING"
+	FLOAT_OBJ        = "FLOAT"
 )
 
 type Integer struct {
@@ -101,4 +103,26 @@ func (f *FunctionLiteral) Inspect() string {
 	out.WriteString("\n}")
 
 	return out.String()
+}
+
+type StringLiteral struct {
+	Value string
+}
+
+func (s *StringLiteral) Type() ObjectType {
+	return STRING_OBJ
+}
+func (s *StringLiteral) Inspect() string {
+	return s.Value
+}
+
+type FloatLiteral struct {
+	Value float64
+}
+
+func (f *FloatLiteral) Type() ObjectType {
+	return FLOAT_OBJ
+}
+func (f *FloatLiteral) Inspect() string {
+	return fmt.Sprintf("%f", f.Value)
 }

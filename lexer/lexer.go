@@ -1,6 +1,8 @@
 package lexer
 
-import "turbo/token"
+import (
+	"turbo/token"
+)
 
 type Lexer struct {
 	input        string
@@ -82,6 +84,10 @@ func (l *Lexer) NextToken() token.Token {
 		} else {
 			tok = newToken(token.GT, l.ch)
 		}
+	case '"':
+		tok.Type = token.STRING
+		tok.Literal = l.readString()
+
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
@@ -92,8 +98,15 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
-			tok.Type = token.INT
-			tok.Literal = l.readNumber()
+			literal, tokenType, ok := l.readNumber()
+			if !ok {
+				tok = newToken(token.ILLEGAL, l.ch)
+				return tok
+			}
+
+			tok.Literal = literal
+			tok.Type = tokenType
+
 			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch) // if we encounter an unknown character, we create an ILLEGAL token
@@ -110,6 +123,18 @@ func newToken(tokenType token.TokenType, ch byte) token.Token {
 	return token.Token{Type: tokenType, Literal: string(ch)}
 }
 
+func (l *Lexer) readString() string {
+	position := l.position + 1
+	for {
+		l.readChar()
+		if l.ch == '"' || l.ch == 0 {
+			break
+		}
+
+	}
+	return l.input[position:l.position]
+}
+
 func (l *Lexer) readIdentifier() string {
 	position := l.position
 	for isLetter(l.ch) {
@@ -118,12 +143,22 @@ func (l *Lexer) readIdentifier() string {
 	return l.input[position:l.position]
 }
 
-func (l *Lexer) readNumber() string {
+func (l *Lexer) readNumber() (string, token.TokenType, bool) {
 	position := l.position
-	for isDigit(l.ch) { // readChar() reads the next character and advances our position in the input string
+	tokenType := token.INT
+	ok := true
+
+	for isDigit(l.ch) || l.ch == '.' || l.ch == 'f' {
+		if l.ch == '.' {
+			// when multiple floating points are encountered, return an error
+			if tokenType == token.FLOAT {
+				ok = false
+			}
+			tokenType = token.FLOAT
+		}
 		l.readChar()
 	}
-	return l.input[position:l.position]
+	return l.input[position:l.position], token.TokenType(tokenType), ok
 }
 
 func (l *Lexer) skipWhitespace() { // skip over any whitespace characters by repeatedly calling readChar() until it encounters a non-whitespace character

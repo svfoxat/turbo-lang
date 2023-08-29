@@ -7,6 +7,7 @@ package parser
 
 import (
 	"strconv"
+	"strings"
 	"turbo/ast"
 	"turbo/lexer"
 	"turbo/token"
@@ -73,6 +74,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.ASTERISK, p.parsePrefixExpression)
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FUNCTION, p.parseFunctionLiteral)
+	p.registerPrefix(token.STRING, p.parseStringLiteral)
+	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression) // register infix parse functions
@@ -99,6 +102,21 @@ func (p *Parser) Errors() []string {
 func (p *Parser) nextToken() {
 	p.currToken = p.peekToken
 	p.peekToken = p.l.NextToken()
+}
+
+func (p *Parser) parseStringLiteral() ast.Expression {
+	return &ast.StringLiteral{Token: p.currToken, Value: p.currToken.Literal}
+}
+
+func (p *Parser) parseFloatLiteral() ast.Expression {
+	floatValue := strings.ReplaceAll(p.currToken.Literal, "f", "")
+	value, err := strconv.ParseFloat(floatValue, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as float", p.currToken.Literal)
+		p.errors = append(p.errors, msg)
+		return nil
+	}
+	return &ast.FloatLiteral{Token: p.currToken, Value: value}
 }
 
 func (p *Parser) ParseProgram() *ast.Program {

@@ -72,6 +72,12 @@ func TestNextTokenExtended(t *testing.T) {
 		} else {
 			return false;
 		}
+		"string"
+		"string with spaces"
+		0
+		0.0
+		0.1f
+		0.0.0
 	`
 
 	tests := []struct {
@@ -137,6 +143,12 @@ func TestNextTokenExtended(t *testing.T) {
 		{token.FALSE, "false"},
 		{token.SEMICOLON, ";"},
 		{token.RBRACE, "}"},
+		{token.STRING, "string"},
+		{token.STRING, "string with spaces"},
+		{token.INT, "0"},
+		{token.FLOAT, "0.0"},
+		{token.FLOAT, "0.1f"},
+		{token.ILLEGAL, "\n"},
 		{token.EOF, ""},
 	}
 

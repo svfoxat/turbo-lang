@@ -271,3 +271,25 @@ func (ce *CallExpression) String() string { // pretty-printing
 	out.WriteString(")")
 	return out.String()
 }
+
+type StringLiteral struct {
+	Token token.Token // the token.STRING token
+	Value string
+}
+
+func (sl *StringLiteral) expressionNode()      {}
+func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
+func (sl *StringLiteral) String() string { // pretty-printing
+	return sl.Token.Literal
+}
+
+type FloatLiteral struct {
+	Token token.Token // the token.FLOAT token
+	Value float64
+}
+
+func (fl *FloatLiteral) expressionNode()      {}
+func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FloatLiteral) String() string { // pretty-printing
+	return fl.Token.Literal
+}

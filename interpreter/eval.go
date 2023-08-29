@@ -27,6 +27,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		return &object.Integer{Value: node.Value}
 	case *ast.BooleanLiteral:
 		return getNativeBoolean(node.Value)
+	case *ast.StringLiteral:
+		return &object.StringLiteral{Value: node.Value}
+	case *ast.FloatLiteral:
+		return &object.FloatLiteral{Value: node.Value}
 	case *ast.PrefixExpression:
 		right := Eval(node.Right, env)
 		if isError(right) {
@@ -146,54 +150,29 @@ func evalProgram(program *ast.Program, env *object.Environment) object.Object {
 	return result
 }
 
-func evalBlockStatement(stmts []ast.Statement, env *object.Environment) object.Object {
-	var result object.Object
-
-	for _, stmt := range stmts {
-		result = Eval(stmt, env)
-
-		if result != nil &&
-			(result.Type() == object.RETURN_VALUE_OBJ || result.Type() == object.ERROR_OBJ) {
-			return result
-		}
-	}
-	return result
-}
-
-func evalIfExpression(ie *ast.IfExpression, env *object.Environment) object.Object {
-	condition := Eval(ie.Condition, env)
-	if isError(condition) {
-		return condition
-	}
-
-	if isTruthy(condition) {
-		return Eval(ie.Consequence, env)
-	} else if ie.Alternative != nil {
-		return Eval(ie.Alternative, env)
-	} else {
-		return NULL
-	}
-}
-
 func evalPrefixExpression(operator string, right object.Object) object.Object {
+	switch right.Type() {
+	case object.INTEGER_OBJ:
+		return evalNumberPrefixExpression(operator, right)
+	case object.FLOAT_OBJ:
+		return evalNumberPrefixExpression(operator, right)
+	}
+
 	switch operator {
 	case "!":
 		return evalBangOperatorExpression(right)
-	case "-":
-		if right.Type() != object.INTEGER_OBJ {
-			return newError("unknown operator: -%s", right.Type())
-		}
-		value := right.(*object.Integer).Value
-		return &object.Integer{Value: -value}
 	default:
 		return newError("unknown operator: %s%s", operator, right.Type())
 	}
 }
 
 func evalInfixExpression(operator string, left, right object.Object) object.Object {
+
 	switch {
 	case left.Type() == object.INTEGER_OBJ && right.Type() == object.INTEGER_OBJ:
-		return evalIntegerInfixExpression(operator, left, right)
+		return evalNumberInfixExpression(operator, left, right)
+	case left.Type() == object.FLOAT_OBJ && right.Type() == object.FLOAT_OBJ:
+		return evalNumberInfixExpression(operator, left, right)
 	case operator == "==":
 		return getNativeBoolean(left == right)
 	case operator == "!=":
@@ -203,79 +182,6 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
-}
-
-func evalIntegerInfixExpression(operator string, left, right object.Object) object.Object {
-	leftValue := left.(*object.Integer).Value
-	rightValue := right.(*object.Integer).Value
-
-	switch operator {
-	case "+":
-		return &object.Integer{Value: leftValue + rightValue}
-	case "-":
-		return &object.Integer{Value: leftValue - rightValue}
-	case "*":
-		return &object.Integer{Value: leftValue * rightValue}
-	case "/":
-		return &object.Integer{Value: leftValue / rightValue}
-	case "<":
-		return getNativeBoolean(leftValue < rightValue)
-	case ">":
-		return getNativeBoolean(leftValue > rightValue)
-	case "==":
-		return getNativeBoolean(leftValue == rightValue)
-	case "!=":
-		return getNativeBoolean(leftValue != rightValue)
-	default:
-		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
-	}
-}
-
-// what should be returned when banged?
-// !5 -> false
-// !0 -> true
-func evalBangOperatorExpression(right object.Object) object.Object {
-	switch right {
-	case TRUE:
-		return FALSE
-	case FALSE:
-		return TRUE
-	case NULL:
-		return FALSE
-	case right.(*object.Integer):
-		if right.(*object.Integer).Value != 0 {
-			return FALSE
-		} else {
-			return TRUE
-		}
-	}
-	return FALSE
-}
-
-func getNativeBoolean(input bool) *object.Boolean {
-	if input {
-		return TRUE
-	} else {
-		return FALSE
-	}
-}
-
-func isTruthy(input object.Object) bool {
-	switch input {
-	case NULL:
-		return false
-	case TRUE:
-		return true
-	case FALSE:
-		return false
-	case input.(*object.Integer):
-		if input.(*object.Integer).Value != 0 {
-			return true
-		} else {
-			return false
-		}
-	}
-	return false
 }
 
 func isError(input object.Object) bool {

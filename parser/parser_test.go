@@ -7,6 +7,25 @@ import (
 	"turbo/lexer"
 )
 
+func TestStringLiteralExpression(t *testing.T) {
+	input := `"hello world";`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParseProgram()
+	checkParserErrors(t, p)
+
+	stmt := program.Statements[0].(*ast.ExpressionStatement) // type assertion
+	literal, ok := stmt.Expression.(*ast.StringLiteral)      // type assertion
+	if !ok {
+		t.Fatalf("[ERROR] expression not *ast.StringLiteral. got=%T", stmt.Expression)
+	}
+
+	if literal.Value != "hello world" {
+		t.Errorf("[ERROR] literal.Value not %q. got=%q", "hello world", literal.Value)
+	}
+}
+
 func TestSimpleLetStatements(t *testing.T) {
 	input := `
     let x = 5;
