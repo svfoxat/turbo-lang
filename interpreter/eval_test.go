@@ -1,4 +1,4 @@
-package vm_test
+package interpreter_test
 
 import (
 	"testing"
@@ -49,7 +49,7 @@ func TestErrorHandling(t *testing.T) {
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
 
-		errObj, ok := evaluated.(*vm.Error)
+		errObj, ok := evaluated.(*interpreter.Error)
 		if !ok {
 			t.Errorf("no error object returned. got=%T(%+v)", evaluated, evaluated)
 			continue
@@ -199,17 +199,17 @@ func TestBangOperator(t *testing.T) {
 }
 
 // UTIL
-func testEval(input string) vm.Object {
+func testEval(input string) interpreter.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
-	env := vm.NewEnvironment()
+	env := interpreter.NewEnvironment()
 
-	return vm.Eval(program, env)
+	return interpreter.Eval(program, env)
 }
 
-func testBooleanObject(t *testing.T, obj vm.Object, expected bool) bool {
-	result, ok := obj.(*vm.Boolean)
+func testBooleanObject(t *testing.T, obj interpreter.Object, expected bool) bool {
+	result, ok := obj.(*interpreter.Boolean)
 	if !ok {
 		t.Errorf("object is not Boolean. got=%T (%+v)", obj, obj)
 		return false
@@ -224,8 +224,8 @@ func testBooleanObject(t *testing.T, obj vm.Object, expected bool) bool {
 	return true
 }
 
-func testIntegerObject(t *testing.T, obj vm.Object, expected int64) bool {
-	result, ok := obj.(*vm.Integer)
+func testIntegerObject(t *testing.T, obj interpreter.Object, expected int64) bool {
+	result, ok := obj.(*interpreter.Integer)
 	if !ok {
 		t.Errorf("object is not Integer. got=%T (%+v)", obj, obj)
 		return false
@@ -240,8 +240,8 @@ func testIntegerObject(t *testing.T, obj vm.Object, expected int64) bool {
 	return true
 }
 
-func testNullObject(t *testing.T, obj vm.Object) bool {
-	if obj != vm.NULL {
+func testNullObject(t *testing.T, obj interpreter.Object) bool {
+	if obj != interpreter.NULL {
 		t.Errorf("object is not NULL. got=%T (%+v)", obj, obj)
 		return false
 	}
