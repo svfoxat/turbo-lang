@@ -4,8 +4,63 @@ import (
 	"testing"
 	"turbo/interpreter"
 	"turbo/lexer"
+	"turbo/object"
 	"turbo/parser"
 )
+
+func TestClosure(t *testing.T) {
+	input := `
+	let newAdder = fn(x) {
+		fn(y) { x + y };
+	};
+	let addTwo = newAdder(2);
+	addTwo(2);
+	`
+
+	testIntegerObject(t, testEval(input), 4)
+}
+
+func TestFunctionApplication(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"let identity = fn(x) { x; }; identity(5);", 5},
+		{"let identity = fn(x) { return x; }; identity(5);", 5},
+		{"let double = fn(x) { x * 2; }; double(5);", 10},
+		{"let add = fn(x, y) { x + y; }; add(5, 5);", 10},
+		{"let add = fn(x, y) { x + y; }; add(5 + 5, add(5, 5));", 20},
+		{"fn(x) { x; }(5)", 5},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
+	}
+}
+
+func TestFunctionObject(t *testing.T) {
+	input := "fn(x) { x + 2; };"
+
+	evaluated := testEval(input)
+	fn, ok := evaluated.(*object.FunctionLiteral)
+	if !ok {
+		t.Fatalf("object is not Function. got=%T (%+v)", evaluated, evaluated)
+	}
+
+	if len(fn.Parameters) != 1 {
+		t.Fatalf("function has wrong parameters. Parameters=%+v", fn.Parameters)
+	}
+
+	if fn.Parameters[0].String() != "x" {
+		t.Fatalf("parameter is not 'x'. got=%q", fn.Parameters[0])
+	}
+
+	expectedBody := "(x + 2)"
+
+	if fn.Body.String() != expectedBody {
+		t.Fatalf("body is not %q. got=%q", expectedBody, fn.Body.String())
+	}
+}
 
 func TestLetStatement(t *testing.T) {
 	tests := []struct {
@@ -49,7 +104,7 @@ func TestErrorHandling(t *testing.T) {
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
 
-		errObj, ok := evaluated.(*interpreter.Error)
+		errObj, ok := evaluated.(*object.Error)
 		if !ok {
 			t.Errorf("no error object returned. got=%T(%+v)", evaluated, evaluated)
 			continue
@@ -199,17 +254,17 @@ func TestBangOperator(t *testing.T) {
 }
 
 // UTIL
-func testEval(input string) interpreter.Object {
+func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParseProgram()
-	env := interpreter.NewEnvironment()
+	env := object.NewEnvironment()
 
 	return interpreter.Eval(program, env)
 }
 
-func testBooleanObject(t *testing.T, obj interpreter.Object, expected bool) bool {
-	result, ok := obj.(*interpreter.Boolean)
+func testBooleanObject(t *testing.T, obj object.Object, expected bool) bool {
+	result, ok := obj.(*object.Boolean)
 	if !ok {
 		t.Errorf("object is not Boolean. got=%T (%+v)", obj, obj)
 		return false
@@ -224,8 +279,8 @@ func testBooleanObject(t *testing.T, obj interpreter.Object, expected bool) bool
 	return true
 }
 
-func testIntegerObject(t *testing.T, obj interpreter.Object, expected int64) bool {
-	result, ok := obj.(*interpreter.Integer)
+func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
+	result, ok := obj.(*object.Integer)
 	if !ok {
 		t.Errorf("object is not Integer. got=%T (%+v)", obj, obj)
 		return false
@@ -240,7 +295,7 @@ func testIntegerObject(t *testing.T, obj interpreter.Object, expected int64) boo
 	return true
 }
 
-func testNullObject(t *testing.T, obj interpreter.Object) bool {
+func testNullObject(t *testing.T, obj object.Object) bool {
 	if obj != interpreter.NULL {
 		t.Errorf("object is not NULL. got=%T (%+v)", obj, obj)
 		return false

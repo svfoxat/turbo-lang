@@ -6,6 +6,7 @@ import (
 	"io"
 	"turbo/interpreter"
 	"turbo/lexer"
+	"turbo/object"
 	"turbo/parser"
 )
 
@@ -14,7 +15,7 @@ const PROMPT = ">>> "
 func Start(in io.Reader, out io.Writer) {
 	printBanner()
 	scanner := bufio.NewScanner(in)
-	env := interpreter.NewEnvironment()
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Fprint(out, PROMPT)
