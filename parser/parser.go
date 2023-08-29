@@ -21,17 +21,20 @@ import (
 const (
 	_ int = iota
 	LOWEST
-	EQUALS      // ==
-	LESSGREATER // > or <
-	SUM         // +
-	PRODUCT     // *
-	PREFIX      // -X or !X
-	CALL        // myFunction(X)
+	EQUALS            // ==
+	LESSGREATER_EQUAL // <= or >=
+	LESSGREATER       // > or <
+	SUM               // +
+	PRODUCT           // *
+	PREFIX            // -X or !X
+	CALL              // myFunction(X)
 )
 
 var precedences = map[token.TokenType]int{ // map of precedences
 	token.EQ:       EQUALS,
 	token.NOT_EQ:   EQUALS,
+	token.GT_EQ:    LESSGREATER_EQUAL,
+	token.LT_EQ:    LESSGREATER_EQUAL,
 	token.LT:       LESSGREATER,
 	token.GT:       LESSGREATER,
 	token.PLUS:     SUM,

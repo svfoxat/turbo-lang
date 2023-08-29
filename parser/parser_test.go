@@ -237,6 +237,8 @@ func TestInfixExpressions(t *testing.T) {
 		{"true == true", true, "==", true},
 		{"true != false", true, "!=", false},
 		{"false == false", false, "==", false},
+		{"1.0 >= 1.0", 1.0, ">=", 1.0},
+		{"1.0 <= 1.0", 1.0, "<=", 1.0},
 	}
 
 	for _, tt := range infixTests {
@@ -636,9 +638,29 @@ func testLiteralExpression(t *testing.T, exp ast.Expression, expected interface{
 		return testIdentifier(t, exp, v)
 	case bool:
 		return testBooleanLiteral(t, exp, v)
+	case float64:
+		return testFloatLiteral(t, exp, v)
 	}
 	t.Errorf("[ERROR]type of exp not handled. got=%T", exp)
 	return false
+}
+
+func testFloatLiteral(t *testing.T, exp ast.Expression, value float64) bool {
+	flo, ok := exp.(*ast.FloatLiteral)
+	if !ok {
+		t.Errorf("exp not *ast.FloatLiteral. got=%T", exp)
+		return false
+	}
+
+	if flo.Value != value {
+		t.Errorf("flo.Value not %f. got=%f", value, flo.Value)
+		return false
+	}
+	if flo.TokenLiteral() != fmt.Sprintf("%f", value) {
+		t.Errorf("flo.TokenLiteral not %f. got=%s", value, flo.TokenLiteral())
+		return false
+	}
+	return true
 }
 
 func testBooleanLiteral(t *testing.T, exp ast.Expression, value bool) bool {

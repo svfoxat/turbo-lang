@@ -2,6 +2,7 @@ package ast
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"turbo/token"
 )
@@ -288,8 +289,10 @@ type FloatLiteral struct {
 	Value float64
 }
 
-func (fl *FloatLiteral) expressionNode()      {}
-func (fl *FloatLiteral) TokenLiteral() string { return fl.Token.Literal }
+func (fl *FloatLiteral) expressionNode() {}
+func (fl *FloatLiteral) TokenLiteral() string {
+	return fmt.Sprintf("%f", fl.Value)
+}
 func (fl *FloatLiteral) String() string { // pretty-printing
 	return fl.Token.Literal
 }

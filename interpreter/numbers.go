@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"turbo/object"
 )
 
@@ -71,6 +72,10 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 		return getNativeBoolean(leftValue == rightValue)
 	case "!=":
 		return getNativeBoolean(leftValue != rightValue)
+	case ">=":
+		return getNativeBoolean(leftValue >= rightValue)
+	case "<=":
+		return getNativeBoolean(leftValue <= rightValue)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}
@@ -79,6 +84,8 @@ func evalIntegerInfixExpression(operator string, left, right object.Object) obje
 func evalFloatInfixExpression(operator string, left, right object.Object) object.Object {
 	leftValue := left.(*object.FloatLiteral).Value
 	rightValue := right.(*object.FloatLiteral).Value
+
+	fmt.Println(leftValue, operator, rightValue)
 
 	switch operator {
 	case "+":
@@ -97,6 +104,10 @@ func evalFloatInfixExpression(operator string, left, right object.Object) object
 		return getNativeBoolean(leftValue == rightValue)
 	case "!=":
 		return getNativeBoolean(leftValue != rightValue)
+	case ">=":
+		return getNativeBoolean(leftValue >= rightValue)
+	case "<=":
+		return getNativeBoolean(leftValue <= rightValue)
 	default:
 		return newError("unknown operator: %s %s %s", left.Type(), operator, right.Type())
 	}

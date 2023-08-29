@@ -8,6 +8,29 @@ import (
 	"turbo/parser"
 )
 
+func TestFloatLiteral(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected float64
+	}{
+		{"5.0", 5.0},
+		{"5.5", 5.5},
+		{"-5.5", -5.5},
+		{"-5.0", -5.0},
+		{"5.0 + 5.0 + 5.0 + 5.0 - 10.0", 10.0},
+		{"2.0 * 2.0 * 2.0 * 2.0 * 2.0", 32.0},
+		{"-50.0 + 100.0 + -50.0", 0.0},
+		{"5.0 * 2.0 + 10.0", 20.0},
+		{"5.0 + 2.0 * 10.0", 25.0},
+		{"-50.0 + 100.0 + -50.0", 0.0},
+	}
+
+	for _, tt := range tests {
+		evaluated := testEval(tt.input)
+		testFloatObject(t, evaluated, tt.expected)
+	}
+}
+
 func TestStringLiteral(t *testing.T) {
 	input := `"Hello World!"`
 
@@ -239,6 +262,17 @@ func TestEvalBoolean(t *testing.T) {
 		{"1 != 1", false},
 		{"1 == 2", false},
 		{"1 != 2", true},
+		{"1.0 == 1.0", true},
+		{"1.0 != 1.0", false},
+		{"1.0 == 2.0", false},
+		{"1.0 != 2.0", true},
+		{"1.0 < 2.0", true},
+		{"1.0 > 2.0", false},
+		{"1.0 <= 2.0", true},
+		{"1.0 >= 2.0", false},
+		{"1.0 <= 1.0", true},
+		{"1.0 >= 1.0", true},
+		{"1.0 <= 0.0", false},
 	}
 
 	for _, tt := range tests {
@@ -260,6 +294,12 @@ func TestBangOperator(t *testing.T) {
 		{"!!5", true},
 		{"!0", true},
 		{"!!0", false},
+		{"!-5", false},
+		{"!!-5", true},
+		{"!5.0", false},
+		{"!!5.0", true},
+		{"!0.0", true},
+		{"!!0.0", false},
 	}
 
 	for _, tt := range tests {
@@ -315,5 +355,21 @@ func testNullObject(t *testing.T, obj object.Object) bool {
 		t.Errorf("object is not NULL. got=%T (%+v)", obj, obj)
 		return false
 	}
+	return true
+}
+
+func testFloatObject(t *testing.T, obj object.Object, expected float64) bool {
+	result, ok := obj.(*object.FloatLiteral)
+	if !ok {
+		t.Errorf("object is not Float. got=%T (%+v)", obj, obj)
+		return false
+	}
+
+	if result.Value != expected {
+		t.Errorf("object has wrong value. got=%f, want=%f",
+			result.Value, expected)
+		return false
+	}
+
 	return true
 }
