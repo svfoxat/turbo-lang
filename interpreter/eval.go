@@ -173,6 +173,8 @@ func evalInfixExpression(operator string, left, right object.Object) object.Obje
 		return evalNumberInfixExpression(operator, left, right)
 	case left.Type() == object.FLOAT_OBJ && right.Type() == object.FLOAT_OBJ:
 		return evalNumberInfixExpression(operator, left, right)
+	case left.Type() == object.STRING_OBJ && right.Type() == object.STRING_OBJ:
+		return evalStringInfixExpression(operator, left, right)
 	case operator == "==":
 		return getNativeBoolean(left == right)
 	case operator == "!=":
